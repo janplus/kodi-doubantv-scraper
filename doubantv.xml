@@ -88,6 +88,9 @@
 			<RegExp input="$$2" output="&lt;url function=&quot;GetDetailsFromHTML&quot;&gt;http://movie.douban.com/subject/\1&lt;/url&gt;" dest="5+">
 				<expression/>
 			</RegExp>
+			<RegExp input="$$2" output="&lt;episodeguide&gt;&lt;url cache=&quot;\1-eps.html&quot;&gt;http://movie.douban.com/subject/\1&lt;/url&gt;&lt;/episodeguide&gt;" dest="5+">
+				<expression></expression>
+			</RegExp>            
 			<expression noclean="1"/>
 		</RegExp>
 	</GetDetails>	
@@ -116,11 +119,34 @@
 		</RegExp>
 	</GetFanart>
 
-
     <!-- Douban API does not provide episode info -->
-    <GetEpisodeList dest="3">
-    </GetEpisodeList>
+	<GetEpisodeList dest="8">
+		<RegExp input="$$9" output="&lt;episodeguide&gt;\1&lt;/episodeguide&gt;" dest="8">
+		  <RegExp input="$$2" output="\1" dest="13">
+		    <expression>subject/(\d+)</expression>
+		  </RegExp>
+          <RegExp input="$$1" output="\1" dest="14">
+            <expression>&quot;episode_list&quot;&gt;(.*?)&lt;/div&gt;</expression>
+          </RegExp>
+          <RegExp input="$$14" output="&lt;episode&gt;&lt;url cache=&quot;douban-$$13-\1.html&quot;&gt;http://movie.douban.com/subject/$$13/episode/\1&lt;/url&gt;&lt;epnum&gt;\1&lt;/epnum&gt;&lt;season&gt;1&lt;/season&gt;&lt;/episode&gt;" dest="9">
+            <expression repeat="yes">(\d+)</expression>
+          </RegExp>
+		  <expression noclean="1"/>
+		</RegExp>
+	</GetEpisodeList>
 
-	<GetEpisodeDetails dest="3">
-    </GetEpisodeDetails>
+	<GetEpisodeDetails dest="4">
+		<RegExp input="$$5" output="&lt;details&gt;\1&lt;/details&gt;" dest="4">
+			<RegExp input="$$3" output="\1" dest="9">
+			  <expression>episode/(\d+)</expression>
+			</RegExp>
+			<RegExp input="$$1" output="&lt;title&gt;\1&lt;/title&gt;" dest="5+">
+			  <expression trim="1,2">&lt;title&gt;(.*?)&lt;/title&gt;</expression>
+			</RegExp>
+			<RegExp input="$$1" output="&lt;plot&gt;\1&lt;/plot&gt;" dest="5+">
+			  <expression trim="1,2">&lt;p id=&quot;link-report&quot;&gt;.*?&lt;span class=&quot;all&quot;&gt;(.*?)&lt;/span&gt;</expression>
+			</RegExp>
+			<expression noclean="1"/>
+		</RegExp>
+	</GetEpisodeDetails>
   </scraper>
